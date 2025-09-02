@@ -1,0 +1,1 @@
+gpio_dt_spec

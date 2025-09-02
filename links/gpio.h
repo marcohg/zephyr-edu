@@ -1,0 +1,1 @@
+/home/marco/zephyrproject/zephyr/include/zephyr/drivers/gpio.h
