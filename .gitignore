@@ -1,0 +1,7 @@
+# Ignore 'build' file/folder anywhere  
+**/[Bb]uild
+
+cmake_shawnhymel/
+i2c/
+memfault/
+official_doc/
