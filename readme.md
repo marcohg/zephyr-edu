@@ -11,6 +11,7 @@ After reading most of documentation
 `west flash -d ../build --runner jlink` or  
 `west debug --build-dir ../build --runner jlink` # to flash or debug
 
-
 ## Blinky
+We start with this project, moving out from workspace for free-standing 
 - Doc [Blinky](https://docs.zephyrproject.org/latest/samples/basic/blinky/README.html#blinky)
+- See notes for commits at blinly/ 
