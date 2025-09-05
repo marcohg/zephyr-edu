@@ -1,13 +1,13 @@
 / {
   // Motivation for having different overlays: we plan to use differents boards.
-  leds {
-    // compatible = "gpio-leds";  we don't need, is a child of 'leds' node
-    led_d8: d8 {
+  arduino-digital {
+    compatible = "gpio-leds";  // still using gpio-leds binding for now
+    D8: digital-d8 {
       gpios = <&gpio2 02 GPIO_ACTIVE_HIGH>;
-		  label = "Led Arduino D8";
+		  label = "Arduino D8";
     };
   };
   aliases {
-    myled = &led_d8;
+    dio8 = &D8;
   };
 };
