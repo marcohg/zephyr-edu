@@ -15,3 +15,5 @@ After reading most of documentation
 We start with this project, moving out from workspace for free-standing 
 - Doc [Blinky](https://docs.zephyrproject.org/latest/samples/basic/blinky/README.html#blinky)
 - See notes for commits at blinly/ 
+  - Blinky
+  - Add second output (led)

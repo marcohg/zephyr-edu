@@ -43,3 +43,20 @@ GDB when TUI, `set tui mouse-events on` to allow mouse to work properly.
 #5  gpio_pin_toggle_dt (spec=spec@entry=0x60006694 <led>) at        /home/marco/zephyrproject/zephyr/include/zephyr/drivers/gpio.h:1737
 #6  0x6000248a in main () at /home/marco/Documents/fw/zephyr/blinky/src/main.c:38
 ```
+## EVK Schematic
+- User Led is  GPIO_11 ACTIVE_HIGH  - GPIO1 401B_8000
+- Arduino D8 - extra out, TP34, GPIO_SD_02  
+- User button is GPIO_SD_06
+
+GPIO1 base address: 401B_8000h.
+GPIO2 base address: 4200_0000h.
+GPIO5 base address: 400C_0000h.
+
+Instance  Port          Pad         Mode  12x12pin
+GPIO2     GPIO2_IO02    GPIO_SD_02  ALT5  74
+GPIOMUX   GPIOMUX_IO11  GPIO_11     ALT5  1   (default)
+
+## Adding Extra GPIO output
+- Easy is add a child node (arduino) D8 to the leds.
+- Note that we are using the 'same' name, but supposed to used &leds?
+- use mcuxpresso to add it and sort the doc  
