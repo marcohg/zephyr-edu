@@ -60,3 +60,34 @@ GPIOMUX   GPIOMUX_IO11  GPIO_11     ALT5  1   (default)
 - Easy is add a child node (arduino) D8 to the leds.
 - Note that we are using the 'same' name, but supposed to used &leds?
 - use mcuxpresso to add it and sort the doc  
+
+## Exploring the gpio API
+[GPIO Driver APIs](https://docs.zephyrproject.org/latest/doxygen/html/group__gpio__interface.html)
+GPIO API Data Structures: gpio_dt_spec,	gpio_driver_config, 	gpio_driver_data, 	gpio_callback
+
+### gpio_dt_spec
+Container for GPIO pin information specified in devicetree  
+This type contains a pointer to a GPIO device, pin number for a pin controlled by that device,  
+and the subset of pin configuration flags which may be given in devicetree.
+It is assigned using any `GPIO_DT_SPEC_GETxx`  
+Data fields: 
+- `const struct device * port `
+- `gpio_pin_t 	pin` 
+- `gpio_dt_flags_t 	dt_flags`
+
+
+### `struct device * port` 
+Runtime device structure (in ROM) per driver instance.   
+The  `const void * 	config` member --> this is casted to the nxp data structure   
+`const struct mcux_igpio_config *config = dev->config;n`
+Example for ledo0 in blinky:   
+$17 = {common = {port_pin_mask = 0xffffffff}, igpio_mmio = {addr = 0x401b8000}, pin_muxes = 0x60006d38, mux_count = 0x1d}
+
+## GDB
+- jlink: JLinkGDBServer
+- info breakpoints - list all break
+- monitor reset - resets targetcd
+
+## Next Exercises
+- Create a custom devicetree binding from gpio (not depending on gpio-leds).
+- Inputs - Button
