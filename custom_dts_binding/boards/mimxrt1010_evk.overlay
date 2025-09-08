@@ -1,0 +1,13 @@
+/*
+ * Copyright (c) 2023 Martin Jäger / Libre Solar
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/ {
+	load_switch: load_switch {
+		compatible = "power-switch";
+		gpios = <&gpio2 02 GPIO_ACTIVE_HIGH>;	// Arduino D8
+
+	};
+};
