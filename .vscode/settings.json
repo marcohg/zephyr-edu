@@ -1,0 +1,12 @@
+{
+    "editor.renderLineHighlight": "all",
+    "cmake.ignoreCMakeListsMissing": true,
+    "workbench.colorCustomizations": {
+        "[Default Dark Modern]": {
+            "editor.lineHighlightBackground": "#46492d",
+        },
+        "[Default Light Modern]": {
+            "editor.lineHighlightBackground": "#f4ff93",
+        }
+}
+
