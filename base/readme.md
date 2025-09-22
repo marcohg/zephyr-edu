@@ -1,21 +1,27 @@
-# Exercise i2c and console
-Used [golioth shell] reference to debug i2c
-- use blinky as base, no optimization, board overlay
+# Read AHT21 Using APIs i2c primitives
+
+## Exercise i2c and console
+Starting point to understand zephyr i2c is zephyr shell.  
+- This [golioth] article explains three shells, we use the Normal and i2c ones.
+- use blinky as base, no optimization `-Og`, board overlay
 - Node i2c@401a4000 is the lpi2c1 peripheral SCL (D15), SDA(14)
+  - add a child aht21@38, no binding as we'll use primitives.
+## make it work
+- One measurment
+- No float printf, see [formatted out](https://docs.zephyrproject.org/latest/services/formatted_output.html)
+- DTS.overlay - need to learn more on nodes
 
-## AHT21
-AHT21_SLAVE_ADDR_7BIT 0x38
-1.  AHT21_GET_STATUS 0x71
-read 0x38 0x71 
-  0x18 - next
-2. wait 10ms
 
-States
-1. Init     100ms
+
+## AHT21 states
+The following description will evolve in a state machine, separate thread.
+`AHT21_SLAVE_ADDR_7BIT 0x38`
+
+1. Init 100ms
 2. GetStatus, AHT21_GET_STATUS 0x71
-read 0x38 0x71 
-  0x18 - next, requires init otherwise
-3. InitializeAht,    	  //  AHT requires initialization (TBD)
+  - read 0x38 0x71 
+  - If 0x18, next. Otherwise, requires init (not implemented) 
+  - InitializeAht,    	  //  AHT requires initialization (TBD)
 4. PowerupEnds, 				  // 10ms delay at end of init sequence
   Transfer(measurement_trigger)
   write  0x38 0xAC 0x33 0x00
@@ -33,4 +39,4 @@ read 0x38 0x71
 RetryDataRequest,     // sensor was busy, retry
 MeasuringPeriod,  		// Waiting to comply measurement period
 ---
-[golioth shell]:https://blog.golioth.io/how-to-use-zephyr-shell-for-interactive-prototyping-with-i2c-sensors/)  
+[golioth]:https://blog.golioth.io/how-to-use-zephyr-shell-for-interactive-prototyping-with-i2c-sensors/

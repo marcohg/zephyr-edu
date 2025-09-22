@@ -1,22 +1,12 @@
 &lpi2c1 {
   status = "okay";
 
-  // apds9960@39 {
-  //   compatible = "avago,apds9960";
-  //   reg = <0x39>;
-  //   label = "APDS9960";
-  //   int-gpios = <&gpio0 26 (GPIO_ACTIVE_LOW)>;
-  // };
-  ads1115: ads1115@48 {
-		compatible = "ti,ads1115";
-		reg = <0x48>;
+	aht21: aht21@38 {
+		// compatible (not yet)
 		#io-channel-cells = <1>;
-    // mh adds
-    // clock-source = "MCLK";
-    // clocks = <&ccm IMX_CCM_SAI1_CLK 0x2004 4>;
-    // clock-names = "mclk";
-    // mh ends
-		status = "okay";
+		reg = <0x38>;
+		label = "AHT21 Humidity and Temperature";
 	};
 
+  
 };
