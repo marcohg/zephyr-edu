@@ -25,9 +25,9 @@ typedef struct aht_tag {
 	int eio;								// error i/0
 	struct i2c_dt_spec i2c;
 	int meas_period;
-	int RH;
-	int C;
-	int F;
+	double RH;
+	double C;
+	double F;
 } aht_t;
 
 
@@ -49,15 +49,11 @@ int GetStatus(aht_t *a) {
 static void FormatData(aht_t *a, uint8_t *buffer) {
 	static const uint32_t pow_2_20 = 0x100000;
 	uint32_t s_rh = (uint32_t)buffer[1] << 12 | (uint32_t)buffer[2] << 4 | buffer[3] >> 4;
-	double relative_humidity = 100*((float)s_rh/pow_2_20);
+	a->RH = 100*((double)s_rh/pow_2_20);
 	uint32_t s_t = (uint32_t)buffer[3] << 16 | (uint32_t)buffer[4] << 8 | (uint32_t)buffer[5];
 	s_t &= 0x0FFFFF;
-	double temperature = ((float)s_t/pow_2_20)*200 -50;
-
-	// Presenmting using intx10 instead floats 
-	a->C = temperature *10;
-	a->F = (temperature *9/5 + 32)*10;
-	a->RH = relative_humidity * 10;
+	a->C = ((double)s_t/pow_2_20)*200 -50;
+	a->F = a->C *9/5 + 32;
 }
 
 int GetMeasurement(aht_t *a) {
@@ -139,10 +135,9 @@ int main(void)
 	.state = INIT,
 	.eio = 0,
 	};
-
 	while(1) {
 		AhtStateMachine(&aht21);
-		printk("RH: %d C: %d F: %d x10\n",aht21.RH, aht21.C, aht21.F);
+		printk("RH: %f C: %f F: %f\n",aht21.RH, aht21.C, aht21.F);
 	}
 
 	return 0;

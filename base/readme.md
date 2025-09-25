@@ -23,8 +23,14 @@ This command parameter has two bytes, the first byte is 0x33, and the second byt
 
 3. Wait 80ms for the measurement to be completed, if the read status word Bit[7] is 0, it means the measurement is completed, and then six bytes can be read continuously; otherwise, continue to wait.
 
+## Floating point printf
+[formatted out](https://docs.zephyrproject.org/latest/services/formatted_output.html) also Kconfig Options in documentation.
+- `west build -t menuconfig` to config libray/floating point - save minimimal config.
+- `CONFIG_REQUIRES_FLOAT_PRINTF=y`
+> Not using this CONFIG_SERIAL=y, CONFIG_HW_STACK_PROTECTION=y, CONFIG_ARM_MPU=y
+- Picolibc Size flash 36296->41208 
+
 ### Current Issues
-- No float printf, see [formatted out](https://docs.zephyrproject.org/latest/services/formatted_output.html)
 - No error handling.
 - DTS.overlay - need to learn more on nodes
 - Single thread doesn't take k_malloc(STR_LEN); try later on multi-threads
