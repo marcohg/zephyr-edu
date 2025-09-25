@@ -6,37 +6,28 @@ Starting point to understand zephyr i2c is zephyr shell.
 - use blinky as base, no optimization `-Og`, board overlay
 - Node i2c@401a4000 is the lpi2c1 peripheral SCL (D15), SDA(14)
   - add a child aht21@38, no binding as we'll use primitives.
+
 ## make it work
-- One measurment
+- Sinlge pass-one measurment
+
+## Use AhtStateMachine
+- Single thread (main)
+- Repetitive measurement
+
+Define 3 states: `INIT,MEASUREMENT,SERVICE` from datasheet, Sensor Reading.
+7.4 Sensor Reading Process   
+1. After power-on, wait for ≥100ms. Before reading the temperature and humidity value, get a byte of status word by sending 0x71. If the status word and 0x18 are not equal to 0x18, initialize the 0x1B, 0x1C, 0x1E registers, details Please refer to our official website routine for the initialization process; if they are equal, proceed to the next step.
+
+2. Wait 10ms to send the 0xAC command (trigger measurement). 
+This command parameter has two bytes, the first byte is 0x33, and the second byte is 0x00.
+
+3. Wait 80ms for the measurement to be completed, if the read status word Bit[7] is 0, it means the measurement is completed, and then six bytes can be read continuously; otherwise, continue to wait.
+
+### Current Issues
 - No float printf, see [formatted out](https://docs.zephyrproject.org/latest/services/formatted_output.html)
+- No error handling.
 - DTS.overlay - need to learn more on nodes
+- Single thread doesn't take k_malloc(STR_LEN); try later on multi-threads
 
-
-
-## AHT21 states
-The following description will evolve in a state machine, separate thread.
-`AHT21_SLAVE_ADDR_7BIT 0x38`
-
-1. Init 100ms
-2. GetStatus, AHT21_GET_STATUS 0x71
-  - read 0x38 0x71 
-  - If 0x18, next. Otherwise, requires init (not implemented) 
-  - InitializeAht,    	  //  AHT requires initialization (TBD)
-4. PowerupEnds, 				  // 10ms delay at end of init sequence
-  Transfer(measurement_trigger)
-  write  0x38 0xAC 0x33 0x00
-
-5. MeasurementTriggered, // Wait before sending a meassure data request (80ms)
-  Transfer(measurement_request)
-    write 0x38 0xAC 0x33 0x00
-  
-6. MeasureDataRequested, // wait for the i2c data to complete, 
-  read 0x38 7 bytes
-  if (buffer[0]& 0x80) == 0 )
-    format received data
-
-
-RetryDataRequest,     // sensor was busy, retry
-MeasuringPeriod,  		// Waiting to comply measurement period
 ---
 [golioth]:https://blog.golioth.io/how-to-use-zephyr-shell-for-interactive-prototyping-with-i2c-sensors/
