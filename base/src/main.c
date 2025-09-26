@@ -10,7 +10,15 @@
 
 
 #define I2C_NODE DT_NODELABEL(aht21)
-#define STR_LEN 50
+
+#define STR_LEN 50	// strlen 
+#define I2C_NOT_READY "i2c bus not ready"
+#define I2C_ERROR_BUS_NOT_READY  "i2c error: bus is not ready"
+#define I2C_ERROR_GET_STATUS "i2c error: GetStatus"
+#define AHT_NEEDS_INITIALIZATION "AHT Needs Initialization"
+#define I2C_ERROR_TRIGGER_MEASUREMENT  "i2c error: Trigger Measurement"
+#define I2C_ERROR_READ_MEASUREMENT "i2c error: Read Measurement"
+
 const uint16_t measurement_period = 250;
 
 typedef enum {
@@ -22,7 +30,7 @@ typedef enum {
 typedef struct aht_tag {
 	aht_state_t state;
 	char str[STR_LEN];
-	int eio;								// error i/0
+	int eio;								// error i/o
 	struct i2c_dt_spec i2c;
 	int meas_period;
 	double RH;
@@ -30,23 +38,22 @@ typedef struct aht_tag {
 	double F;
 } aht_t;
 
-
 int GetStatus(aht_t *a) {
 	uint8_t get_status[] = {0x71};
 	
 	if( (a->eio = i2c_read_dt(&a->i2c, get_status, 1)) ) {
-		sprintf(a->str,"GetStatus i2c error");
+		sprintf(a->str,I2C_ERROR_GET_STATUS);	
 		return 1;
 	}
 	
 	if((get_status[0] & 0x18) != 0x18 ) {
-		sprintf(a->str,"NeedsInitialization");
+		sprintf(a->str,AHT_NEEDS_INITIALIZATION);	
 		return 1;
 	}
 	return 0;
 }
 
-static void FormatData(aht_t *a, uint8_t *buffer) {
+void FormatData(aht_t *a, uint8_t *buffer) {
 	static const uint32_t pow_2_20 = 0x100000;
 	uint32_t s_rh = (uint32_t)buffer[1] << 12 | (uint32_t)buffer[2] << 4 | buffer[3] >> 4;
 	a->RH = 100*((double)s_rh/pow_2_20);
@@ -59,23 +66,22 @@ static void FormatData(aht_t *a, uint8_t *buffer) {
 int GetMeasurement(aht_t *a) {
 	const uint8_t trigger_meas[] = { 0xAC, 0x33, 0x00};
 	if((a->eio = i2c_write_dt(&a->i2c, trigger_meas, 3)) ) {
-		sprintf(a->str,"ErrorI2cTriggerMeasurement");
+		sprintf(a->str,I2C_ERROR_TRIGGER_MEASUREMENT); 
 		return 1;
 	}
 	k_msleep(80);
 	a->meas_period = measurement_period - 80;
 	const int max_retry = 10;
-	bool new_meas = false;
-	for(int retries =0; !new_meas || retries < max_retry; ++retries) {
+	for(int retries =0; retries < max_retry; ++retries) {
 		uint8_t data[7];
 		if((a->eio = i2c_read_dt(&a->i2c,data,7))) {
-			sprintf(a->str,"ReadDataError i2c");
+			sprintf(a->str, I2C_ERROR_READ_MEASUREMENT);	
 			return 1;
 		}
 		else
 			if((data[0]&0x80)==0) {
 				FormatData(a, data);
-				new_meas = true;
+				return 0;
 			}
 			else {
 				k_msleep(20);	// retry - busy
@@ -84,16 +90,29 @@ int GetMeasurement(aht_t *a) {
 					a->meas_period = 0;
 			}
 	}
-	
-	if(new_meas)
-		return 0;
-	else {
-		sprintf(a->str, "NoData %d", max_retry);
-		return 1;
-	}
+	sprintf(a->str, "No Data after %d retries", max_retry);
+	return 1;
 }
 
- void HandleError(aht_t *aht) {
+ void ServiceHandler(aht_t *aht) {
+	static bool ack = false;
+	static int count = 0;
+	if(!ack) {
+		printk("Service: %s\r\n",aht->str);
+		ack = true;
+	}
+	if(strcmp(aht->str, AHT_NEEDS_INITIALIZATION)==0) {
+		// look for web instrunctions
+	}
+	if(++count > 10) {
+		ack = false;
+		count =0;
+		printf("No error recovery yet, reset sensor!\r\n");
+		aht->state = INIT;
+		k_msleep(5000);
+	}
+	else
+		k_msleep(500);
 
  }
 
@@ -101,8 +120,8 @@ int AhtStateMachine(aht_t *a) {
 	switch(a->state) {
 		case INIT:
 			if (!i2c_is_ready_dt(&a->i2c)) { 
-				sprintf(a->str,"i2c bus not ready");
-				a->state = MEASUREMENT;
+				sprintf(a->str,I2C_ERROR_BUS_NOT_READY);	
+				a->state = SERVICE;
 				return 1; 
 			}
 			k_msleep(100);
@@ -117,16 +136,16 @@ int AhtStateMachine(aht_t *a) {
 		case MEASUREMENT:
 			if(GetMeasurement(a)==0)	
 				k_msleep(a->meas_period);
+			else
+				a->state = SERVICE;
 			break;
 
 		case SERVICE:
-			HandleError(a);
+			ServiceHandler(a);
 			break;
 	}
 	return 0;
 }
-
-
 
 int main(void)
 {
@@ -137,8 +156,8 @@ int main(void)
 	};
 	while(1) {
 		AhtStateMachine(&aht21);
-		printk("RH: %f C: %f F: %f\n",aht21.RH, aht21.C, aht21.F);
+		if(aht21.state == MEASUREMENT)
+			printk("RH: %f T: %fC, %fF\n",aht21.RH, aht21.C, aht21.F);
 	}
-
 	return 0;
 }

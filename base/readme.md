@@ -30,8 +30,12 @@ This command parameter has two bytes, the first byte is 0x33, and the second byt
 > Not using this CONFIG_SERIAL=y, CONFIG_HW_STACK_PROTECTION=y, CONFIG_ARM_MPU=y
 - Picolibc Size flash 36296->41208 
 
+## Minimum Error Handler
+- SERVICE state provides a minimum handler.
+- aht_t:str member provides status/info about the service
+
+
 ### Current Issues
-- No error handling.
 - DTS.overlay - need to learn more on nodes
 - Single thread doesn't take k_malloc(STR_LEN); try later on multi-threads
 

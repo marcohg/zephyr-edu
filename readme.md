@@ -43,4 +43,14 @@ We start with this project, moving out from workspace for free-standing
 - Use the i2c shell to scan-debug the hardware (added some targets to play)
 - Use AHT21 to measure relative humididty and temperature.
 - See the base/readme.md notes
+- make it a thread, retrospective, skim device tree docs.
+
+## GDB commands
+- jlink: JLinkGDBServer
+- info breakpoints - list all break
+- monitor reset - resets targetcd
+- disable breakpoint, enable breakpoint
+- set variable foo = 123
+
+
 
