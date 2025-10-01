@@ -52,5 +52,18 @@ We start with this project, moving out from workspace for free-standing
 - disable breakpoint, enable breakpoint
 - set variable foo = 123
 
+## Explore Second serial
+- Assign a separate uart to Console and Shell.
+- NXP Pin Tool was used find second uart routed to Arduino connector
+[58] GPIO_AD_02   LPUART4_TX    A5
+[59] GPIO_AD_01   LPUART4_RX    A4
 
+### lpuart4 
+- Set property `status = okay` to enable in the project overlay.
+- Keep console in lpuart1 and use lpuart4 for shell.
+- Enable float in printf:
+  - `west build -t menuconfig` ->  `Requires floating point support in printf` 
+  - Use `Save minimum config` to get the kconfig changes to set in prj.config
+- Need to explore more pin-ctrl (like pinmux_lpuart4)
 
+https://community.nxp.com/t5/Zephyr-Project-Knowledge-Base/Zephyr-custom-boards-and-applications/ta-p/2008567

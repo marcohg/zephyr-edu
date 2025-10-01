@@ -1,3 +1,13 @@
+/{
+
+		chosen {
+		zephyr,console = &lpuart4;
+		zephyr,shell-uart = &lpuart1;
+		zephyr,uart-mcumgr = &lpuart1;
+	};
+
+};
+
 &lpi2c1 {
   status = "okay";
 
@@ -5,8 +15,14 @@
 		// compatible (not yet)
 		#io-channel-cells = <1>;
 		reg = <0x38>;
-		label = "AHT21 Humidity and Temperature";
+		// label = "AHT21 Humidity and Temperature";	// <-deprecated
 	};
+};
 
-  
+&lpuart4 {
+	status = "okay";
+	current-speed = <115200>;
+	pinctrl-0 = <&pinmux_lpuart4>;
+	pinctrl-1 = <&pinmux_lpuart4_sleep>;
+	pinctrl-names = "default", "sleep";
 };
