@@ -64,6 +64,25 @@ We start with this project, moving out from workspace for free-standing
 - Enable float in printf:
   - `west build -t menuconfig` ->  `Requires floating point support in printf` 
   - Use `Save minimum config` to get the kconfig changes to set in prj.config
-- Need to explore more pin-ctrl (like pinmux_lpuart4)
+- Need to explore more pin-ctrl, like pinmux_lpuart4/group0/{
+	- pinmux = <&iomuxc_gpio_ad_01_lpuart4_rxd>,<&iomuxc_gpio_ad_02_lpuart4_txd>;
+  - A4  SDA ADC12_1 LPUART4:RXD
+  - A5  SCL ADC12_2 LPUART4:TXD
+
+## mimxrt1010_evk 5V Supply selector J1.
+- Jumper 1-2 selects OpenSda (J41) convenbient as only one USB cable needed, but can not 
+  supply enough current. The board powers up in `MAINTENANCE` mode.
+- We jumper 3-9 the get power from USB OTG, this requires an extra cable at J9
+
+## Modbus rtu_server
+- use [RTU server](https://docs.zephyrproject.org/latest/samples/subsys/modbus/rtu_server/README.html#modbus-rtu-server)
+- Tested on FRDM-K64, arduino 15 (D9), arduino_serial (uart3)
+
+## Next test
+- Generate dtsi information *.mex to *.dtsi using pin tool
+- Generator location 
+- Simple hello_world  and add second uart, toggle pin.
+/home/marco/zephyrproject/modules/hal/nxp/mcux/scripts/pinctrl/gen_board_pinctrl.py
+
 
 https://community.nxp.com/t5/Zephyr-Project-Knowledge-Base/Zephyr-custom-boards-and-applications/ta-p/2008567
